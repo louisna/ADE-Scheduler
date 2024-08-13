@@ -12,6 +12,7 @@ jobs:
       ADE_AUTHORIZATION: ${{ secrets.ADE_AUTHORIZATION }}
       ADE_DATA: ${{ secrets.ADE_DATA }}
       ADE_DB_PATH: postgresql+psycopg2://adeschtest:adeschtest@localhost:5432/adeschtest
+      ADE_REDIS_URL: redis://localhost:6379/0
       ADE_FAKE_API: true
       ADE_URL: ${{ secrets.ADE_URL }}
       FLASK_APP: app.py

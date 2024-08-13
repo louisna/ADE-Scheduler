@@ -36,6 +36,7 @@ from flask_migrate import Migrate
 from flask_session import Session
 from jsmin import jsmin
 from lxml.etree import XMLSyntaxError
+from redis.connection import ConnectionPool
 from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import InternalServerError
 
@@ -156,11 +157,13 @@ app.config["ADE_FAKE_API"] = (
     else False
 )
 
+redis_connection_pool = ConnectionPool.from_url(os.environ["ADE_REDIS_URL"])
+
 manager = mng.Manager(
     ade.Client(app.config["ADE_API_CREDENTIALS"])
     if not app.config["ADE_FAKE_API"]
     else ade.FakeClient(app.config["ADE_API_CREDENTIALS"]),
-    srv.Server(host="localhost", port=6379),
+    srv.Server(connection_pool=redis_connection_pool),
     md.db,
     redis_ttl_config,
 )
