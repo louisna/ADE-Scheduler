@@ -19,6 +19,9 @@ UCLOUVAIN_CLIENT_SECRET = some_secret_secret
 # DB
 ADE_DB_PATH = sqlite:///adescheduler.db
 
+# REDIS
+ADE_REDIS_URL = redis://localhost:6379/0
+
 # LOGGING
 MAIL_SERVER = smtp.gmail.com
 MAIL_USERNAME = no-email@gmail.com
