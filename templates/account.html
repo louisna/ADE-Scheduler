@@ -34,6 +34,7 @@ _.forEach(htmlWebpackPlugin.files.js, function(file) { %>
   </div>
 </div>
 
+{% if config['ADE_SCHEDULER_IMPORT_EXTERNAL_CAL'] == True %}
 <!-- external calendar modal -->
 <div class="modal fade" id="externalCalendarModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
@@ -110,6 +111,7 @@ _.forEach(htmlWebpackPlugin.files.js, function(file) { %>
     </form>
   </div>
 </div>
+{% endif %}
 
 <div class="container-lg">
   <div class="row">
@@ -327,7 +329,7 @@ _.forEach(htmlWebpackPlugin.files.js, function(file) { %>
           </div>
         </li>
       </ul>
-
+      {% if config['ADE_SCHEDULER_IMPORT_EXTERNAL_CAL'] == True %}
       <h4
         class="d-flex justify-content-between align-items-center"
         style="margin-top: 0.5em"
@@ -430,6 +432,7 @@ _.forEach(htmlWebpackPlugin.files.js, function(file) { %>
         </li>
 
       </ul>
+      {% endif %}
     </div>
   </div>
 </div>
