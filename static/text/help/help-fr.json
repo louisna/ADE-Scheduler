@@ -1,89 +1,72 @@
 [
   {
     "id": "ade-scheduler",
-    "title": "ADE Scheduler",
+    "title": "Mon Horaire",
     "subtitles": [
       {
         "id": "what-is",
-        "title": "Qu'est-ce qu'ADE Scheduler ?",
-        "content": "ADE Scheduler est un outil visant à fournir les mêmes informations que le <a href='http://horaire.uclouvain.be/direct'>site officiel d'horaires</a> de l'UCLouvain mais de manière plus intuitive. Ce site offre en plus plusieurs outils comme des liens d'abonnement à des calendriers, l'organisation de vos différents horaires, le filtrage de certains évènements (par exemple CMs ou TPs), la visualisation des locaux et de leur emplacement, et bien d'autres choses encore ! "
+        "title": "Qu'est-ce que Mon horaire ?",
+        "content": "<strong>Mon horaire</strong> est un outil qui permet de visualiser son horaire de manière intuitive. Ce site offre en plus plusieurs options comme importer votre horaire type, organiser vos différents horaires, filtrer certains évènements (par exemple cours ou TPs), intégrer vos activités personnelles, visualiser les locaux et leur emplacement, et bien d'autres choses encore !<br><br>À l'origine connu sous le nom d'ADE Scheduler, cet outil a été créé en août 2019 par trois étudiants entrant alors en master. Leur objectif était d'offrir une alternative plus complète et plus agréable d'utilisation à l'outil horaire officiel alors mis en place. Après cinq ans de popularité croissante et d'utilisation par des dizaines de milliers d'étudiants à l'UCLouvain, il est devenu l'outil officiel en septembre 2024, changeant au passage de nom pour <strong>Mon Horaire</strong>.<br><br>Logiciel libre développé à l'origine par Gilles Poncelet, Louis Navarre et Jérome Eertmans, <strong>Mon Horaire</strong> est aujourd'hui maintenu par les équipes informatiques de l'UCLouvain."
       },
       {
         "id": "getting-started",
         "title": "Pour débuter",
-        "content": "L'objectif premier de ce site est son calendrier. Si vous êtes nouveau ici, faites un tour sur <a href='https://ade-scheduler.info.ucl.ac.be/calendar'>cette page</a> et testez toutes les fonctionnalités. Vous êtes aussi encouragé à regarder notre guide de prise en main rapide. ",
-        "video": "https://www.youtube.com/embed/u82x-eysurU"
-      },
-      {
-        "id": "computing",
-        "title": "Calculer votre horaire optimal",
-        "content": "Parfois, vous avez le choix parmi plusieurs évènements comme des CMs ou des TPs, mais vous ne devez assister qu'à un seul de chacun. L'outil nommé calculer essaye toutes les combinaisons d'horaires possibles en choisissant un évènement de chaque type, chaque semaine, et retourne les 5 meilleurs horaires qui minimisent les conflits. Si vous voulez être libre durant une tranche horaire, assurez-vous de créer un évent personnel durant cette tranche horaire. Vous pouvez également retirer des évènements avant d'utiliser l'outil de calcul, afin de ne pas les prendre en compte. Comme l'outil optimise semaine par semaine, il n'est pas certain que toutes les semaines soient les mêmes. Si vous avez besoin d'assister toujours aux mêmes évènements, nous vous encourageons à choisir, après calcul, la semaine qui vous plait le plus et de manuellement sélectionner les évènements dans votre horaire principal. ",
-        "video": "https://www.youtube.com/embed/l87bsDuCJmg"
+        "content": "Voici une vidéo pour vous guider :",
+        "video": "https://www.youtube.com/embed/sFQJggpmYGA"
       }
     ]
   },
   {
-    "id": "export",
-    "title": "Importer et exporter",
+    "id": "import",
+    "title": "Importer mon horaire type",
     "subtitles": [
       {
-        "id": "possibilities",
-        "title": "Quelles sont les possibilités ?",
-        "content": "Une fois votre horaire fait, vous n'avez pas besoin de retourner à chaque fois sur ADE Scheduler pour voir votre horaire : vous pouvez l'exporter ! La plupart des applications de calendriers, telles que Gmail, permettent d'importer un calendrier externe. Une courte vidéo vous montre comment exporter votre horaire vers votre application favorite. ",
-        "video": "https://www.youtube.com/embed/4IiNB3J1Dm0"
+        "id": "connect-import",
+        "title": "Connexion et importation",
+        "content": "Lorsque vous vous connectez pour la première fois, Mon Horaire importe automatiquement  l’horaire-type de votre formation."
       },
       {
-        "id": "ical-file",
-        "title": "Télécharger un fichier iCal",
-        "content": "Une solution pour exporter votre horaire est de le télécharger au format iCalendar. Ensuite, ce fichier peut être facilement importé dans votre calendrier principal. Le problème avec cette approche est qu'aucun changement dans votre horaire, de votre part ou de ADE, ne pourra être pris en compte dans votre calendrier. Si vous préférez avoir un calendrier à jour, choisissez alors la prochaine solution. "
+        "id": "customize-course",
+        "title": "Désélectionner des codes cours de l’horaire-type",
+        "content": "Si certains cours au choix ne vous concernent pas, il est possible de les désélectionner en cliquant sur le crayon à côté du code de votre formation sur la gauche de la page horaire."
       },
       {
-        "id": "sub-link",
-        "title": "Liens d'abonnement",
-        "content": "La meilleure solution que peut vous proposer ADE Scheduler est certainement celle du lien d'abonnement. Avec ce lien, votre application de calendrier mettra à jour de manière régulière les évènements et vous ne manquerez aucun changement dans votre horaire ! Egalement, tout changement de votre part, tel qu'ajouter ou retirer un cours, sera pris en compte lors de la prochaine mise à jour de votre calendrier de la part de votre application. "
+        "id": "add-course",
+        "title": "Ajout des codes cours",
+        "content": "Vous pouvez ajouter un cours qui ne se trouve pas dans votre horaire-type en encodant son code (exemple : LCHIM1111, WFARM2121, BDROI1110…)."
+      },
+      {
+        "id": "select-event",
+        "title": "Sélection d’un évènement, groupe…",
+        "content": "Si vous cliquez sur une activité de votre planning (ou sur le crayon à côté du code de cours sur la gauche de la page horaire), vous verrez apparaitre tous les évènements contenus dans ce cours, par type (cours magistral, travaux pratiques). Cette option vous permet de choisir vos groupes de tps par exemple."
       }
     ]
   },
   {
     "id": "account",
-    "title": "Compte & Paramètres",
+    "title": "Ajouter des évènements personnels",
     "subtitles": [
       {
-        "id": "possibilities-2",
-        "title": "Quelles sont les possibilités ?",
-        "content": "Sur ADE Scheduler, il n'est pas requis d'avoir un compte pour utiliser la plupart des outils proposés. Votre session utilisateur est stockée par votre navigateur pour une durée de 30 jours. Il vous est donc possible d'automatiquement récupérer et modifier votre calendrier sur votre navigateur dans un délai de 30 jours après votre dernière connexion. Néanmoins, si vous désirez garder de manière persistante votre calendrier, ou si vous voulez pouvoir le consulter sur notre site depuis d'autres appareils, il est requis de vous <a href='https://ade-scheduler.info.ucl.ac.be/account'>créer un compte</a>. Avec ce dernier, vous pouvez créer et sauvegarder plusieurs calendriers, les renommer, choisir la palette de couleur, et bien d'autres choses encore. "
-      },
-      {
         "id": "custom-events",
-        "title": "Evènements personnels",
-        "content": "La vie étudiante est importante, mais votre vie personnelle l'est encore plus ! C'est pourquoi il vous est possible d'ajouter vos propres évènements personnalisés à votre calendrier. Ils apparaitront dans le calendrier, mais ils seront aussi pris en compte lors du calcul du meilleur horaire de cours pour vous ! Notre outil de calcul tentera de minimiser les conflits entre les horaires de cours, et vos évènements personnels. "
-      },
-      {
-        "id": "event-selection",
-        "title": "Sélection d'un évènement",
-        "content": "Si vous cliquez sur le code d'un cours, sur la gauche de la page calendrier, vous verrez apparaitre tous les évènements contenus dans ce cours, par type. Vous pouvez (dé)sélectionner des évènements spécifiques afin de construire l'horaire qui vous plait. "
-      },
-      {
-        "id": "accounts",
-        "title": "Comptes",
-        "content": " Créer un compte requiert deux choses : une adresse email et un mot de passe. Votre adresse email sera uniquement utilisée pour changer votre mot de passe ou vous transmettre des informations importantes. Sur la page compte, vous pouvez choisir parmi vos différents horaires et aussi changer leurs informations. Le paramètre année académique indiquera à notre service l'année depuis laquelle vous souhaitez obtenir les évènements (la plupart du temps, seule une année est disponible). "
-      },
-      {
-        "id": "external-calendars",
-        "title": "Calendriers externes",
-        "content": "Vous avez peut-être un calendrier que vous aimeriez partager avec les utilisateurs d'ADE Scheduler ? Le cas classique serait pour des évènements étudiants comme ceux de la CASA, les 24h Vélo, etc. Ceci est possible en allant sur la page compte et en créant votre propre calendrier externe. Pour cela, vous devez fournir un lien iCal vers votre calendrier. Ce type de lien peut facilement être généré, par ex., depuis votre calendrier Google Agenda. Afin d'éviter le spam, votre calendrier doit d'abord etre apprové par nous avant de pouvoir être public, ce pourquoi nous vous recommendons d'utiliser le champ de description afin de nous communiquer l'objectif de votre calendrier, ainsi que de nous envoyer un mail."
+        "title": "Créer des évènements",
+        "content": "La vie étudiante est importante, mais votre vie personnelle l'est encore plus ! C'est pourquoi il vous est possible d'ajouter vos propres évènements personnalisés à votre calendrier en cliquant sur + créer un évènement."
       }
-
     ]
   },
   {
-    "id": "stay-informed",
-    "title": "Rester informé",
+    "id": "export",
+    "title": "Exporter",
+    "content": "<strong>Mon horaire</strong> vous permet d’exporter votre planning vers d’autres applications de calendriers, telles que Gmail (qui permettent d'importer un calendrier externe) soit en téléchargeant un fichier iCal soit via un lien d’abonnement.<br><br><p class=\"text-danger\">Attention ! Nous ne pouvons pas garantir la fréquence des mises à jour car elle dépend de l’application de votre calendrier. <strong>Mon horaire</strong> reste donc l’interface officielle de consultation de votre planning.<p><br>",
     "subtitles": [
       {
-        "id": "changelog",
-        "title": "Nouveautés",
-        "content": "Afin de fournir le meilleur outil possible aux étudiants et professeurs de l'UCLouvain, ADE Scheduler est continuellement en développement. Il est donc possible que de nouvelles fonctionnalités soient ajoutées depuis votre dernière utilisation. Pour rester informé de toutes les modifications d'ADE Scheduler, n'hésitez pas à aller consulter notre <a href='https://ade-scheduler.info.ucl.ac.be/whatisnew'>page des nouveautés</a>. "
+        "id": "ical-file",
+        "title": "Télécharger un fichier iCal",
+        "content": "Une solution pour exporter votre horaire est de le télécharger au format iCalendar. Ensuite, ce fichier peut être facilement importé dans votre calendrier principal. Le problème avec cette approche est qu'aucun changement dans votre horaire ne pourra être pris en compte dans votre calendrier."
+      },
+      {
+        "id": "sub-link",
+        "title": "Liens d'abonnement",
+        "content": "La meilleure solution d’export que peut vous proposer <strong>Mon horaire</strong> est certainement celle du lien d'abonnement. Avec ce lien, votre application de calendrier mettra à jour de manière régulière vos activités (cours et évènements personnels). "
       }
     ]
   }

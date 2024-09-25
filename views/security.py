@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from flask import Blueprint, flash, redirect, request, session, url_for
@@ -8,6 +9,7 @@ from requests.exceptions import HTTPError
 
 import backend.cookies as cookies
 import backend.models as md
+from backend.uclouvain_apis import My
 
 security = Blueprint("security", __name__, static_folder="../static")
 
@@ -27,9 +29,8 @@ def login():  # noqa: C901
     # If you use another hostname, you will be logged under `Super Dev` name.
     # WARNING: this won't work the day where we want to add features requiring
     #          a OAuth token... (currently, we do not use it at all.)
-    if (
-        app.env == "development"
-        and request.base_url != "https://ade-scheduler.info.ucl.ac.be/login"
+    if app.env == "development" and request.base_url != os.path.join(
+        app.config.get("ALLOWED_HOST", "login")
     ):
         user = md.User.query.filter_by(fgs="dev").first()
         # If dev user doesn't exist, create it
@@ -61,20 +62,22 @@ def login():  # noqa: C901
     else:
         # Fetch token
         token = uclouvain.authorize_access_token()
-
         # Fetch user role & ID
         my_fgs = None
         role = None
-        resp = uclouvain.get("my/v0/digit/roles", token=token)
+        api_base_url = app.config["MY_BASE_URL"]
+        my_role_url = os.path.join(api_base_url, My.roles_url())
+        resp = uclouvain.get(my_role_url, token=token)
         try:
             resp.raise_for_status()
-        except HTTPError:
+        except HTTPError as err:
             flash(
                 gettext(
                     "Hum... it looks like the authentification server is having some issues - please try again. If the problem persists, do contact us directly so we can look into it."
                 ),
                 "error",
             )
+            app.logger.error(err)
             return redirect(url_for("calendar.index"))
         data = resp.json()
         roles = list()
@@ -82,11 +85,11 @@ def login():  # noqa: C901
             roles.append(business_role["businessRoleCode"])
             my_fgs = business_role["identityId"]
 
-        # Determine which role, priority on employee, then student.
-        if 1 in roles:
-            role = "employee"
-        elif 2 in roles:
+        # Determine which role, priority on student, then employee.
+        if 2 in roles:
             role = "student"
+        elif 1 in roles:
+            role = "employee"
         else:
             flash(
                 gettext(
@@ -95,12 +98,16 @@ def login():  # noqa: C901
                 + "<br><br><b>Code: role list</b>",
                 "error",
             )
+            app.logger.error("role not found", exc_info=True)
             return redirect(url_for("calendar.index"))
 
         # Create user if does not exist
         user = md.User.query.filter_by(fgs=my_fgs).first()
         if user is None:
-            resp = uclouvain.get(f"my/v0/{role}", token=token)
+            my_employee_url = os.path.join(
+                api_base_url, My.personal_data_url(role)
+            )
+            resp = uclouvain.get(my_employee_url, token=token)
             try:
                 resp.raise_for_status()
             except HTTPError:
@@ -110,6 +117,7 @@ def login():  # noqa: C901
                     ),
                     "error",
                 )
+                app.logger.error("role not found", exc_info=True)
                 return redirect(url_for("calendar.index"))
             data = resp.json()
 

@@ -3,17 +3,17 @@
     <!-- Sidebar -->
     <nav
       id="sidebar"
-      class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"
+      class="col-xl-2 col-md-3 d-md-block bg-light sidebar collapse"
     >
-      <div class="sidebar-sticky p-3">
+      <div class="sidebar-sticky p-2 m-3">
         <slot />
       </div>
     </nav>
 
     <!-- Toggle button  -->
-    <button class="btn btn-dark rounded-pill btn-nav" @click="toggle">
-      <i v-if="show" style="font-size: 32px" class="bi bi-chevron-up" />
-      <i v-else style="font-size: 32px" class="bi bi-chevron-down" />
+    <button v-if="!hideaction" class="btn btn-dark rounded-pill btn-nav" style="z-index: 1050;" @click="toggle">
+      <i v-if="show" style="font-size: 32px;" :class="iconclassonshow" />
+      <i v-else style="font-size: 32px;" :class="iconclassonhide" />
     </button>
   </div>
 </template>
@@ -22,6 +22,20 @@
 import { Collapse } from 'bootstrap';
 
 export default {
+  props: {
+    iconclassonshow: {
+      type: String,
+      default: 'bi bi-chevron-up'
+    },
+    iconclassonhide: {
+      type: String,
+      default: 'bi bi-chevron-down'
+    },
+    hideaction: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       show: false,

@@ -1,7 +1,7 @@
 /* global Flask */
 
 import Vue from 'vue';
-import store from './store.js';
+
 import L from 'leaflet';
 import { LMap, LTileLayer } from 'vue2-leaflet';
 import 'overlapping-marker-spiderfier-leaflet/dist/oms';
@@ -11,8 +11,9 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import frLocale from '@fullcalendar/core/locales/fr';
 import Spinner from '../../components/Spinner.vue';
+import store from './store.js';
 import './base.js';
-import '../css/classroom.css';
+import '../css/classroom.scss';
 import 'leaflet/dist/leaflet.css';
 
 const axios = require('axios');
@@ -35,8 +36,23 @@ const uclWeeksNo = {
   ],
   2022: [
     0, 0, 0, -2, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, 10, 11, 12, 13, -3, -3, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-    12, 13, 14, -3, -3, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    11, 12, 13, 14, -3,
+  ],
+  2023: [
+    -3, 0, 0, 0, -2, 1, 2, 3, 4, 5, 6, 7, 8, -1, -1, 9, 10, 11, 12, 13, -3, -3,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    11, 12, 13, 14, -3, -3,
+  ],
+  2024: [
+    -3, 0, 0, 0, -2, 1, 2, 3, 4, 5, 6, 7, 8, -1, -1, 9, 10, 11, 12, 13, -3, -3,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    11, 12, 13, 14, -3, -3,
+  ],
+  2025: [
+    -3, 0, 0, 0, -2, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, -1, -1, 12, 13, -3, -3,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    11, 12, 13, 14, -3, -3,
   ],
 };
 
@@ -78,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         // url: 'https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png',
         center: L.latLng(50.6681, 4.6118),
-        zoom: 15,
+        zoom: 9,
         attribution:
           '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
         classrooms: [],
@@ -91,8 +107,8 @@ document.addEventListener('DOMContentLoaded', () => {
           locale: document.getElementById('current-locale').innerText.trim(),
           timeZone: 'Europe/Brussels', // Show schedule in the same TZ where classes are given
           height: 'auto',
-          slotMinTime: '08:00:00',
-          slotMaxTime: '21:00:00',
+          slotMinTime: '07:00:00',
+          slotMaxTime: '23:30:00',
           editable: false,
           droppable: false,
           allDaySlot: false,
@@ -165,8 +181,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
           // Header bar
           headerToolbar: {
-            left: 'prev,next today',
-            center: document.body.clientWidth > 550 ? 'title' : '',
+            left:
+              document.body.clientWidth > 550
+                ? 'prev today next'
+                : 'prev,today,next',
+            center: 'title',
             right:
               document.body.clientWidth > 550
                 ? 'dayGridMonth,timeGridWeek'

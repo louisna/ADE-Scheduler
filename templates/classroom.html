@@ -1,5 +1,6 @@
-{% extends "base.html" %} {% block head %} <%
-_.forEach(htmlWebpackPlugin.files.js, function(file) { %>
+{% extends "base.html" %}
+{% block head %}
+<% _.forEach(htmlWebpackPlugin.files.js, function(file) { %>
 <script type="text/javascript" src="<%= file%>"></script>
 <%}); %>
 <script src="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js"></script>
@@ -7,7 +8,8 @@ _.forEach(htmlWebpackPlugin.files.js, function(file) { %>
   href="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css"
   rel="stylesheet"
 />
-{% endblock %} {% block body %}
+{% endblock %}
+{% block body %}
 <div class="modal fade" tabindex="-1" id="calendarModal">
   <div
     class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-md-down"
@@ -121,5 +123,5 @@ _.forEach(htmlWebpackPlugin.files.js, function(file) { %>
       {{ _('Empty :(') }}
     </div>
   </div>
-  {% endblock %}
 </spinner>
+{% endblock %}

@@ -11,6 +11,30 @@
   white-space: pre-wrap;
 }
 
+@media(max-width: 1024px) {
+  .fc .fc-toolbar.fc-header-toolbar {
+    margin-bottom: 1em;
+    font-size: 1em !important;
+  }
+  .fc-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .fc-toolbar.fc-toolbar-chunk>* {
+    flex: 1 1;
+  }
+  .fc-toolbar-chunk:nth-child(2) {
+    margin-top: 10px;
+    order: 2;
+    align-content: center;
+    width: 100%;
+    text-align: center;
+  }
+  .fc-toolbar-chunk:nth-child(3) {
+    order: 1;
+  }
+}
+
 .fc-toolbar-chunk > button,
 .fc-toolbar-chunk > .fc-button-group > button {
   font-size: min(3vw, 1em) !important;
@@ -135,7 +159,14 @@
   background-color: #f8f9fa;
 }
 .code-item > .badge {
-  margin-right: 20px;
+  margin-right: 5px;
+}
+.code-item > .badge:last-child {
+  margin-right: 5px;
+}
+.code-item > .bi {
+  width: 1em;
+  height: 1em;
 }
 .code-tag {
   cursor: pointer;
@@ -159,7 +190,7 @@
 }
 
 #form-add-code > button {
-  margin: 10px 20px 10px;
+  margin: 10px 5px 10px;
   margin-left: 0;
   z-index: 2;
 }

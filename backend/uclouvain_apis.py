@@ -4,8 +4,9 @@ import requests
 
 
 class API:
-    BASE_URL = "https://gw.api.uclouvain.be"
+    BASE_URL = os.getenv("API_BASE_URL")
     ENDPOINT = ""
+    OAUTH_BASE_URL = os.getenv("OAUTH_BASE_URL")
 
     # Combined @classmethod and @property requires Python >= 3.9
     @classmethod
@@ -21,14 +22,14 @@ class API:
     @classmethod
     @property
     def token(cls):
-        return os.path.join(cls.url, "token")
+        return os.path.join(cls.OAUTH_BASE_URL, "token")
 
     TOKEN_URL = token
 
     @classmethod
     @property
     def authorize(cls):
-        return os.path.join(cls.url, "authorize")
+        return os.path.join(cls.OAUTH_BASE_URL, "authorize")
 
     AUTHORIZE_URL = authorize
 
@@ -39,6 +40,23 @@ class ADE(API):
 
 class My(API):
     ENDPOINT = "my/v0"
+
+    @classmethod
+    def roles_url(cls):
+        """Get role url.
+
+        return: url
+        """
+        return f"{cls.ENDPOINT}/digit/roles"
+
+    @classmethod
+    def personal_data_url(cls, role):
+        """Get data url for role.
+
+        :param role: role of the user.
+        return: url
+        """
+        return f"{cls.ENDPOINT}/{role}"
 
 
 class MyADE(API):
