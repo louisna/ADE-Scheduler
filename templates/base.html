@@ -60,7 +60,9 @@
       src="{{ url_for('static', filename='dist/jsglue.min.js')|autoversion }}"
     ></script>
 
-    {%block head%}{%endblock%}
+    <!-- used for inheritance -->
+    {%block head%}
+    {%endblock%}
   </head>
 
   <body class="bg-light">
@@ -340,7 +342,9 @@
           {% endif %}
         </div>
       </nav>
-      <main role="main" id="app" v-pre>{% block body %}{% endblock %}</main>
+      <main role="main" id="app" v-pre>
+          {% block body %}{% endblock %}
+      </main>
 
       <!-- Display error/warning/else messages -->
       <div
@@ -372,5 +376,9 @@
       {% from "custom_macros.html" import render_flash_toast %} {{
       render_flash_toast() }}
     </div>
+    <!-- FOOTER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    {%- block page_footer %}
+      {% include 'footer.html' %}
+    {%- endblock page_footer %}
   </body>
 </html>
