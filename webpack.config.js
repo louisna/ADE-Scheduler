@@ -81,6 +81,12 @@ const conf = {
     new HtmlWebpackPlugin({
       inject: false,
       minify: false,
+      template: './templates/footer.html',
+      filename: './html/footer.html',
+    }),
+    new HtmlWebpackPlugin({
+      inject: false,
+      minify: false,
       template: './templates/custom_macros.html',
       filename: './html/custom_macros.html',
     }),
