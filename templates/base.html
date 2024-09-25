@@ -7,8 +7,8 @@
       name="viewport"
     />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="description" content="ADE Scheduler for UCLouvain students" />
-    <title>ADE Scheduler</title>
+    <meta name="description" content="My Schedule for the UCLouvain students" />
+    <title>{{ _('My schedule') }}</title>
 
     <!-- Google Search Console verification -->
     <meta
@@ -189,7 +189,10 @@
     <div id="app-base">
       <!-- Main navbar -->
       <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark px-2">
-        <a class="navbar-brand me-auto mx-lg-3" href="/"> ADE Scheduler </a>
+        <a class="navbar-brand me-auto mx-lg-3" href="https://uclouvain.be" target="_blank">
+            <img src="/static/img/logo_neg.png" alt="Logo" height="24" class="d-inline-block align-text-top">
+        </a>
+        <a class="navbar-brand me-auto mx-lg-3" href="/"> {{ _('My schedule') }} </a>
         <button
           class="navbar-toggler p-0 border-0"
           type="button"
@@ -203,9 +206,9 @@
             <li class="nav-item">
               <a
                 class="nav-link"
-                v-bind:class="{'active-page': currentPath === '{{ url_for('calendar.index') }}'}"
-                href="{{ url_for('calendar.index') }}"
-                >{{_('Calendar')}}</a
+                target="_blank"
+                href="https://uclouvain.be/fr/etudier/horaires.html"
+                >{{_('Horaires Type')}}</a
               >
             </li>
             <li class="nav-item">
@@ -217,46 +220,13 @@
               >
             </li>
             <li class="nav-item">
-              {% if current_user.is_authenticated %}
-              <a
-                class="nav-link"
-                v-bind:class="{'active-page': currentPath === '{{ url_for('account.index') }}'}"
-                href="{{ url_for('account.index') }}"
-                >{{_('Account')}}</a
-              >
-              {% else %}
-              <a
-                class="nav-link"
-                href="#"
-                data-bs-target="#createAccountModal"
-                data-bs-toggle="modal"
-                >{{_('Account')}}</a
-              >
-              {% endif %}
-            </li>
-            <li class="nav-item">
               <a
                 class="nav-link"
                 v-bind:class="{'active-page': currentPath === '{{ url_for('help.index') }}'}"
                 href="{{ url_for('help.index') }}"
-                >{{_('Help')}}</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                v-bind:class="{'active-page': currentPath === '{{ url_for('contact.index') }}'}"
-                href="{{ url_for('contact.index') }}"
-                >{{_('Contact us')}}</a
-              >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link"
-                v-bind:class="{'active-page': currentPath === '{{ url_for('contribute.index') }}'}"
-                href="{{ url_for('contribute.index') }}"
-                >{{_('Contribute')}}</a
-              >
+                >
+                  <i class="bi bi-question-lg"></i>
+              </a>
             </li>
             {% if current_user.has_role("admin") %}
             <li class="nav-item">
@@ -317,20 +287,29 @@
             </li>
           </ul>
           {% if current_user.is_authenticated %}
-          <div class="text-danger user-logged-in">
-            <label class="text-center mx-3">
-              {{ current_user.first_name }} {{ current_user.last_name }}
-            </label>
-            <button
-              class="btn btn-outline-danger btn-sm"
-              type="button"
-              onclick="window.location.href='{{ url_for('security.logout') }}'"
-            >
-              {{_('Logout')}}
+          <div id="user-logged-in" class="user-logged-in text-danger dropdown">
+            <button type="button" class="btn nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ current_user.first_name }} {{ current_user.last_name }}
             </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li class="nav-item">
+                <a
+                  class="dropdown-item d-flex justify-content-center"
+                  href="{{ url_for('account.index') }}">
+                    {{_('Settings')}}
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="dropdown-item d-flex justify-content-center"
+                  onclick="window.location.href='{{ url_for('security.logout') }}'">
+                    {{_('Logout')}}
+                </a>
+              </li>
+            </ul>
           </div>
           {% else %}
-          <div class="btn-group user-logged-out" style="min-width: 100px">
+          <div id="user-logged-out" class="btn-group user-logged-out" style="min-width: 100px">
             <button
               class="btn btn-outline-light btn-sm w-50"
               type="button"

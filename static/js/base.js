@@ -4,7 +4,7 @@ import Vue from 'vue';
 import AlertToast from '../../components/AlertToast.vue';
 import store from './store.js';
 
-import '../css/base.css';
+import '../css/base.scss';
 import '../css/bootstrap.scss';
 
 Vue.directive('focus', {

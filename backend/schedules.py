@@ -84,7 +84,7 @@ class Schedule:
         ext_cals = filter(lambda s: "EXT:" in s, self.codes)
 
         courses = mng.get_courses(*ext_cals, project_id=self.project_id)
-        min_time_slot, max_time_slot = (8, 0, 0), (20, 0, 0)
+        min_time_slot, max_time_slot = (8, 0, 0), (23, 30, 0)
         for course in courses:
             course_events = course.get_events()
             for event in course_events:

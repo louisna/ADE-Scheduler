@@ -13,11 +13,12 @@ import FullCalendar from '@fullcalendar/vue';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import frLocale from '@fullcalendar/core/locales/fr';
+import enLocale from '@fullcalendar/core/locales/en-gb';
 import Spinner from '../../components/Spinner.vue';
 import SidebarMenu from '../../components/SidebarMenu.vue';
 import store from './store.js';
 import './base.js';
-import '../css/calendar.css';
+import '../css/calendar.scss';
 import CoursesChoiceItem from '../../components/CoursesChoiceItem.vue';
 import {getTranslatedText, getCurrentLanguage} from './services/translate';
 
@@ -47,6 +48,16 @@ const uclWeeksNo = {
   ],
   2023: [
     -3, 0, 0, 0, -2, 1, 2, 3, 4, 5, 6, 7, 8, -1, -1, 9, 10, 11, 12, 13, -3, -3,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    11, 12, 13, 14, -3, -3,
+  ],
+  2024: [
+    -3, 0, 0, 0, -2, 1, 2, 3, 4, 5, 6, 7, 8, -1, -1, 9, 10, 11, 12, 13, -3, -3,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    11, 12, 13, 14, -3, -3,
+  ],
+  2025: [
+    -3, 0, 0, 0, -2, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, -1, -1, 12, 13, -3, -3,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
     11, 12, 13, 14, -3, -3,
   ],
@@ -128,12 +139,12 @@ document.addEventListener('DOMContentLoaded', () => {
         isEditingCustomEvent: false,
         calendarOptions: {
           plugins: [dayGridPlugin, timeGridPlugin],
-          locales: [frLocale],
-          locale: document.getElementById('current-locale').innerText.trim(),
+          locales: [frLocale, enLocale],
+          locale: currentLanguage,
           timeZone: 'Europe/Brussels', // Show schedule in the same TZ where classes are given
           height: 'auto',
-          slotMinTime: '08:00:00',
-          slotMaxTime: '21:00:00',
+          slotMinTime: '07:00:00',
+          slotMaxTime: '23:30:00',
           navLinks: true, // can click day/week names to navigate views
           editable: false,
           droppable: false,
@@ -191,8 +202,11 @@ document.addEventListener('DOMContentLoaded', () => {
             },
           },
           headerToolbar: {
-            left: 'prev,next today addEvent',
-            center: document.body.clientWidth > 550 ? 'title' : '',
+            left:
+              document.body.clientWidth > 550
+                ? 'prev today next addEvent'
+                : 'prev,today,next addEvent',
+            center: 'title',
             right:
               document.body.clientWidth > 550
                 ? 'dayGridMonth,timeGridWeek'
@@ -988,6 +1002,14 @@ document.addEventListener('DOMContentLoaded', () => {
         trigger: 'focus',
       })
   );
+
+  // Customize class on add Event button
+  document.body.onload = function() {
+    const objs = document.getElementsByClassName('fc-addEvent-button');
+    objs[0].className = 'fc-addEvent-button';
+    objs[0].classList.add('btn');
+    objs[0].classList.add('btn-primary');
+  };
 
   var codeDropdown = new Dropdown(document.getElementById('codeInputDropdown'));
   var addEventModal = new Modal(document.getElementById('addEventModal'));

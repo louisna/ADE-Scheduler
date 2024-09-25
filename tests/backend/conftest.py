@@ -26,8 +26,8 @@ def ade_client():
     """Get ADE client."""
     return ade.FakeClient(
         dict(
-            url=os.environ["ADE_URL"],
-            data=os.environ["ADE_DATA"],
+            url=os.environ["ADE_API_URL"],
+            data=os.environ["ADE_API_GRANT_TYPE"],
             Authorization=os.environ["ADE_AUTHORIZATION"],
         )
     )

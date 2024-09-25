@@ -404,20 +404,16 @@
     <div class="nav-scroller bg-white shadow-sm">
         <nav class="nav nav-underline">
             <a class="nav-link active" href="#"
-                v-on:click="getEvents(0)"
-                v-if="selected_schedule==0">
-                ADE
-            </a>
-            <a class="nav-link active" href="#"
                 v-on:click="getEvents(selected_schedule)"
-                v-else>
+                v-if="selected_schedule!=0">
                 {{ _('Schedule') }} #[[ selected_schedule ]]
             </a>
-            <a class="d-flex align-items-center schedule-toggle"
+            <a class="d-flex align-items-center nav-link schedule-toggle mx-3"
                v-on:click="toggleBestSchedules()"
                v-if="n_schedules > 0"
                data-bs-toggle="tooltip"
                title="{{_('Show/Hide')}}">
+                {{ _('Computed schedule') }}
                 <svg xmlns="http://www.w3.org/2000/svg" v-if="!show_best_schedules" width="16" height="16" fill="currentColor" class="bi bi-caret-right" viewBox="0 0 16 16">
                     <path d="M6 12.796V3.204L11.481 8 6 12.796zm.659.753l5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753z"/>
                 </svg>
@@ -429,7 +425,7 @@
                 v-show="show_best_schedules & selected_schedule!=0"
                 v-on:click="getEvents(0)"
                 v-bind:class="{active: selected_schedule==0}">
-                ADE
+                {{ _('Default schedule') }}
             </a>
             <a class="nav-link" href="#"
                 v-show="show_best_schedules & selected_schedule!=i"
@@ -456,29 +452,35 @@
 
     <div class="row">
         <!-- Sidebar -->
-        <sidebar-menu ref="sidebar">
-          <div class="d-flex flex-column overflow-auto" style="margin-top: 45px;">
+        <sidebar-menu ref="sidebar"
+                      :iconclassonshow="'bi bi-calendar3'"
+                      :iconclassonhide="'bi bi-gear'"
+        >
+          <div class="d-flex flex-column overflow-auto sticky-top" style="margin-top: 45px;">
               {% if current_user.is_authenticated %}
                   <div class="dropdown">
-                      <a class="d-flex flex-row flex-nowrap justify-content-between text-dark"
-                         style="text-decoration: none"
+                      <a class="d-flex flex-row flex-nowrap justify-content-between align-items-center text-dark"
+                         style="text-decoration: none; font-size: 1.2rem;"
                          data-bs-toggle="dropdown" href="#">
                           <div class="text-truncate me-2">
                               <h5>[[ currentSchedule.label ]]</h5>
                           </div>
-                          <svg width="23px" height="23px" viewBox="0 0 16 16" class="bi bi-chevron-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                          <svg width="23px" height="23px" viewBox="0 0 16 16" class="bi bi-gear" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
                                style="min-width: 25px;">
                               <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
                           </svg>
                       </a>
                       <div class="dropdown-menu dropdown-schedules" v-if="schedules.length > 0">
                           <h6 class="dropdown-header">{{ _('Schedules') }}</h6>
-                          <a class="dropdown-item text-dark text-truncate" href="#"
-                              v-for="s in schedules"
-                              v-bind:class="{active: s.id == currentSchedule.id}"
-                              v-on:click="loadSchedule($event, s.id)">
-                              [[ s.label ]]
-                          </a>
+                          <div class="dropdown-item-p d-flex justify-content-between text-dark px-2 py-1"
+                               v-bind:class="{active: s.id == currentSchedule.id}" v-for="s in schedules">
+                              <div role="button" class="w-100 text-truncate text-dark align-content-start" href="#"
+                                v-on:click="loadSchedule($event, s.id)">
+                                  <span tabindex="0" data-bs-toggle="tooltip"
+                                    v-bind:title=s.label >[[ s.label ]]</span>
+                              </div>
+                              <a href="/account" class="text-dark align-content-end"><i class="bi bi-pencil"></i></a>
+                          </div>
                       </div>
                       <div class="dropdown-menu dropdown-schedules" v-else>
                           <h6 class="dropdown-header">{{ _('Schedules') }}</h6>
@@ -492,22 +494,16 @@
                       <h5>[[ currentSchedule.label ]]</h5>
                   </div>
               {% endif %}
-              <a tabindex="0" href="#" class="btn-info-custom text-primary"
-                 data-bs-toggle="popover" data-bs-trigger="focus"
-                 data-bs-content="{{ _('To view more info or adapt your schedule, click on a course code. To change the color palette, go to the account page.') }}" data-bs-title="{{ _('Note') }}">
-                  <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-circle-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                      <path fill-rule="evenodd" d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-                  </svg>
-              </a>
               <div class="list-group list-code">
                   <li class="list-group-item code-item d-flex justify-content-between align-items-center"  v-for='code in codes'>
                       <div class="code-tag text-truncate" v-on:click="getDetails(code)">
                           [[ code ]]
                       </div>
-                      <button class="btn btn-danger badge rounded-pill" v-on:click="removeCode(code)">
-                          <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-trash-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                              <path fill-rule="evenodd" d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7z"/>
-                          </svg>
+                      <button class="btn btn-secondary  badge rounded-pill" v-on:click="getDetails(code)">
+                          <i class="bi bi-pencil"></i>
+                      </button>
+                      <button class="btn btn-danger  badge rounded-pill" v-on:click="removeCode(code)">
+                          <i class="bi bi-trash-fill"></i>
                       </button>
                   </li>
                   <li class="list-group-item p-0 list-code-input">
@@ -567,6 +563,7 @@
                   </div>
               </div>
               <div class="btn-group btn-compute-clear mt-3">
+                  {% if config['ADE_SCHEDULER_COMPUTE_SCHEDULE'] == True %}
                   <button class="btn btn-outline-dark btn-sm w-50"
                       type="button"
                       data-bs-toggle="tooltip"
@@ -574,32 +571,24 @@
                       v-on:click="compute(); closeSidebar()">
                       {{_('Compute')}}
                   </button>
+                  {% endif %}
                   <button class="btn btn-outline-dark btn-sm w-50"
                       type="button"
                       data-bs-toggle="tooltip"
                       title="{{_('Start a new schedule from zero\nYou can have multiple schedules with an account')}}"
                       v-on:click="clear(); closeSidebar()">
-                      {{_('New') }}
+                      {{_('Add new schedule') }}
                   </button>
               </div>
-
-              <small class="text-center font-weight-light mt-5">
-                  <a target="_blank" rel="noopener noreferrer" class="text-dark" href="https://github.com/SnaKyEyeS/ADE-Scheduler">{{_('Open source software')}}</a> {{_('designed by Gilles Poncelet, Louis Navarre and Jérome Eertmans, students at the Ecole polytechnique de Louvain.')}}
-              </small>
           </div>
         </sidebar-menu>
 
         <!-- Main content -->
         <div class="container-fluid">
-            <div class="col-md-9 ms-sm-auto col-lg-10 p-3">
+            <div class="col-md-9 ms-sm-auto col-xl-10 p-3">
                 <spinner v-bind:computing="computing">
                   <full-calendar ref="calendar" v-bind:options="calendarOptions"></full-calendar>
                 </spinner>
-                <div class="mt-4">
-                    <small class="text-danger font-weight-light">
-                        {{_('Disclaimer: ADE Scheduler is not an official UCLouvain tool. It has been designed with the purpose to help the UCLouvain students with scheduling. This tool is based on ADE UCL but does not replace standard scheduling rules, nor the instructions given by university officials and teachers as those may vary from one course to another.')}}
-                    </small>
-                </div>
             </div>
         </div>
     </div>

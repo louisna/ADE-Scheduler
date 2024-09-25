@@ -145,11 +145,15 @@ app.config["REDIS_TTL"] = redis_ttl_config
 
 # Setup the API Manager
 app.config["ADE_API_CREDENTIALS"] = {
-    "url": os.environ["ADE_URL"],
-    "data": os.environ["ADE_DATA"],
+    "url": os.environ["ADE_API_URL"],
+    "token_url": os.path.join(os.environ["OAUTH_BASE_URL"], "token"),
+    "data": {"grant_type": os.environ["ADE_API_GRANT_TYPE"]},
     "Authorization": os.environ["ADE_AUTHORIZATION"],
 }
+app.config["API_BASE_URL"] = os.environ["API_BASE_URL"]
+app.config["MY_BASE_URL"] = os.environ["MY_BASE_URL"]
 
+app.config["ALLOWED_HOST"] = os.getenv("ALLOWED_HOST")
 
 app.config["ADE_FAKE_API"] = (
     bool(distutils.util.strtobool(os.environ["ADE_FAKE_API"]))
@@ -241,6 +245,7 @@ oauth.register(
     # Authorization
     authorize_url=ucl.API.AUTHORIZE_URL,
     authorize_params=None,
+    scope="openid email",
 )
 app.config["UCLOUVAIN_MANAGER"] = oauth.create_client("uclouvain")
 
@@ -270,8 +275,12 @@ kdf = PBKDF2HMAC(
 key = base64.urlsafe_b64encode(kdf.derive(password))
 app.config["FERNET"] = Fernet(key)
 
-app.config["ADE_SCHEDULER_IMPORT_EXTERNAL_CAL"] = os.environ.get(
+
+app.config["ADE_SCHEDULER_IMPORT_EXTERNAL_CAL"] = os.getenv(
     "ADE_SCHEDULER_IMPORT_EXTERNAL_CAL", False
+)
+app.config["ADE_SCHEDULER_COMPUTE_SCHEDULE"] = os.getenv(
+    "ADE_SCHEDULER_COMPUTE_SCHEDULE", False
 )
 
 

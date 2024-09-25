@@ -7,12 +7,17 @@ FLASK_SECRET_KEY= ABCDEF
 FLASK_SALT= GHIJKL
 TEMPLATE_AUTO_RELOAD = True
 
+ALLOWED_HOST = https://ade-scheduler.info.ucl.ac.be
+
 # DEV
-ADE_URL=https://gw.api.uclouvain.be/token
-ADE_DATA = grant_type=client_credentials
+ADE_API_URL = some_ade_api_url
+ADE_API_GRANT_TYPE = client_credentials
 ADE_AUTHORIZATION = Basic some_secret_key
+API_BASE_URL = some_api_url
+MY_BASE_URL = some_my_api_url
 
 # UCLOUVAIN OAUTH2 API
+OAUTH_BASE_URL = somme_oauth_base_url
 UCLOUVAIN_CLIENT_ID = some_secret_id
 UCLOUVAIN_CLIENT_SECRET = some_secret_secret
 
@@ -34,3 +39,4 @@ ADE_FAKE_API = false
 
 # APP CONFIG
 ADE_SCHEDULER_IMPORT_EXTERNAL_CAL = False
+ADE_SCHEDULER_COMPUTE_SCHEDULE = False

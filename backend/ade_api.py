@@ -340,11 +340,13 @@ def get_token(credentials: ClientCredentials) -> tuple[str, int]:
     :return: the token and its time to expiration in seconds
     :rtype: Tuple[str, int]
     """
-    url = credentials["url"]
+    url = credentials["token_url"]
     data = credentials["data"]
-    authorization = credentials["Authorization"]
-    header = {"Authorization": authorization}
-    resp = requests.post(url=url, headers=header, data=data)
+    headers = {
+        "Authorization": credentials["Authorization"],
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
+    resp = requests.post(url=url, headers=headers, data=data)
 
     if (
         current_app
