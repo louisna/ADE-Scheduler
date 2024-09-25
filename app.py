@@ -270,6 +270,10 @@ kdf = PBKDF2HMAC(
 key = base64.urlsafe_b64encode(kdf.derive(password))
 app.config["FERNET"] = Fernet(key)
 
+app.config["ADE_SCHEDULER_IMPORT_EXTERNAL_CAL"] = os.environ.get(
+    "ADE_SCHEDULER_IMPORT_EXTERNAL_CAL", False
+)
+
 
 # Jinja filter for autoversionning
 @app.template_filter("autoversion")
