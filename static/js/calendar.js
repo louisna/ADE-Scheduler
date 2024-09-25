@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2020-2024 ADE-Scheduler.
+ *
+ * ADE-Scheduler is free software; you can redistribute it and/or modify it
+ * under the terms of the MIT License; see LICENSE file for more details.
+*/
+
 /* global Flask */
 
 import Vue from 'vue';
@@ -11,6 +18,8 @@ import SidebarMenu from '../../components/SidebarMenu.vue';
 import store from './store.js';
 import './base.js';
 import '../css/calendar.css';
+import CoursesChoiceItem from '../../components/CoursesChoiceItem.vue';
+import {getTranslatedText, getCurrentLanguage} from './services/translate';
 
 const axios = require('axios');
 const debounce = require('lodash/debounce');
@@ -59,10 +68,13 @@ Date.prototype.addDays = function (days) {
   return date;
 };
 
+
 document.addEventListener('DOMContentLoaded', () => {
   const isTouchDevice = !!(
     'ontouchstart' in window || navigator.maxTouchPoints
   );
+  const currentLanguage = getCurrentLanguage();
+
   var vm = new Vue({
     el: '#app',
     delimiters: ['[[', ']]'],
@@ -70,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
       FullCalendar,
       'sidebar-menu': SidebarMenu,
       spinner: Spinner,
+      'courses-choice': CoursesChoiceItem
     },
     data() {
       return {
@@ -104,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         courseInfo: {
           code: '',
-          title: '',
+          title: {},
           summary: {},
           filtered: {},
         },
@@ -150,22 +163,15 @@ document.addEventListener('DOMContentLoaded', () => {
               switch (num) {
               case -1:
                 span.innerText =
-                    document
-                      .getElementById('current-locale')
-                      .innerText.trim() === 'EN'
-                      ? 'Easter'
-                      : 'Pâques';
+                  getTranslatedText(currentLanguage, 'calendarEaster');
                 break;
               case -2:
                 span.innerText =
-                    document
-                      .getElementById('current-locale')
-                      .innerText.trim() === 'EN'
-                      ? 'Break'
-                      : 'Congé';
+                  getTranslatedText(currentLanguage, 'calendarBreak');
                 break;
               case -3:
-                span.innerText = 'Blocus';
+                span.innerText =
+                  getTranslatedText(currentLanguage, 'calendarBlocus');
                 break;
               default:
                 span.innerText = '-';
@@ -173,12 +179,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return { domNodes: [span] };
           },
-
           // Header bar
           customButtons: {
             addEvent: {
-              text: '+',
-              hint: document.getElementById('current-locale').innerText.trim() === 'FR' ? 'Créer un nouvel évènement' : 'Create a new event',
+              text: getTranslatedText(currentLanguage, 'addEventButtonText'),
+              hint: getTranslatedText(currentLanguage, 'addEventButtonHint'),
               click: () => {
                 vm.beforeAddEvent();
                 addEventModal.show();
@@ -314,6 +319,10 @@ document.addEventListener('DOMContentLoaded', () => {
           subscriptionType: 0,
           downloadType: 0,
         },
+        studiesInfo: {
+          inscriptions: [],
+          activities: []
+        },
         shareLink: '',
       };
     },
@@ -351,6 +360,9 @@ document.addEventListener('DOMContentLoaded', () => {
         this.getCodeSearchResults,
         200
       );
+    },
+    mounted() {
+      getTranslatedText();
     },
     methods: {
       fetchData() {
@@ -763,6 +775,7 @@ document.addEventListener('DOMContentLoaded', () => {
               this.courseInfo.code = code;
               this.courseInfo.title = resp.data.title;
               this.courseInfo.summary = resp.data.summary;
+              this.courseInfo.filtered = {};
 
               Object.entries(this.courseInfo.summary).forEach(([key, val]) => {
                 Vue.set(this.courseInfo.filtered, key, {});
@@ -956,20 +969,14 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         });
       },
-      getCourseURL(code) {
-        let yearShort = '2021'; // Default value
+      getYearShort() {
+        let yearShort = '2024'; // Default value
         this.projectId.forEach((project) => {
           if (project.id == this.currentProjectId) {
             yearShort = project.year.slice(0, 4);
           }
         });
-
-        if (
-          document.getElementById('current-locale').innerText.trim() === 'FR'
-        ) {
-          return `https://www.uclouvain.be/cours-${yearShort}-${code}`;
-        }
-        return `https://www.uclouvain.be/en-cours-${yearShort}-${code}`;
+        return `${yearShort}`;
       },
     },
   });
@@ -981,6 +988,7 @@ document.addEventListener('DOMContentLoaded', () => {
         trigger: 'focus',
       })
   );
+
   var codeDropdown = new Dropdown(document.getElementById('codeInputDropdown'));
   var addEventModal = new Modal(document.getElementById('addEventModal'));
   var eventModal = new Modal(document.getElementById('eventModal'));
