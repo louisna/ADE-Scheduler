@@ -252,6 +252,126 @@
         </div>
     </div>
 
+    <!-- Info Import Modal -->
+    <div class="modal modal-lg modal-fullscreen-sm-down fade" id="infoImportModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content alert-danger">
+                <div class="modal-body mt-3 mb-3">
+                    {{  _("Your course schedule has been imported.") }}
+                </div>
+                <div class="modal-footer d-flex">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Continue') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- auto import modal -->
+    <div class="modal modal-lg modal-fullscreen-sm-down fade" id="autoImportModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{_('Automatic import')}}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body alert-danger">
+                    <div class="modal-body mt-3 mb-3">
+                        {{  _('There are currently no schedules to import.<br>Encode your codes manually or consult the <a href="https://uclouvain.be/en/study/schedules.html">standard schedule</a> for your course.') }}
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button
+                                type="button"
+                                class="btn btn-outline-danger"
+                                v-on:click="hideAutoImport()"
+                        >
+                            {{ _('Do not show this message again') }}
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div class="modal modal-lg modal-fullscreen-sm-down fade" id="importModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{_('Import course schedule')}}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    {% if not current_user.is_authenticated %}
+                    <h6>{{ _('Do not hesitate to log in with your UCLouvain account... you can:') }}</h6>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item">
+                            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check2-square text-success me-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                                <path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 0 0 3 14.5h10a1.5 1.5 0 0 0 1.5-1.5V8a.5.5 0 0 0-1 0v5a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h8a.5.5 0 0 0 0-1H3A1.5 1.5 0 0 0 1.5 3v10z"/>
+                            </svg>
+                            {{ _('Save your schedules') }}
+                        </li>
+                        <li class="list-group-item">
+                            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check2-square text-success me-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                                <path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 0 0 3 14.5h10a1.5 1.5 0 0 0 1.5-1.5V8a.5.5 0 0 0-1 0v5a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h8a.5.5 0 0 0 0-1H3A1.5 1.5 0 0 0 1.5 3v10z"/>
+                            </svg>
+                            {{ _('Manage several schedules following your needs') }}
+                        </li>
+                        <li class="list-group-item">
+                            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check2-square text-success me-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                                <path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 0 0 3 14.5h10a1.5 1.5 0 0 0 1.5-1.5V8a.5.5 0 0 0-1 0v5a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h8a.5.5 0 0 0 0-1H3A1.5 1.5 0 0 0 1.5 3v10z"/>
+                            </svg>
+                            {{ _('Modify the color of the events in the calendar') }}
+                        </li>
+                        <li class="list-group-item">
+                            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check2-square text-success me-2" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                                <path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 0 0 3 14.5h10a1.5 1.5 0 0 0 1.5-1.5V8a.5.5 0 0 0-1 0v5a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h8a.5.5 0 0 0 0-1H3A1.5 1.5 0 0 0 1.5 3v10z"/>
+                            </svg>
+                            {{ _('And so much more !') }}
+                        </li>
+                    </ul>
+                    {% endif %}
+                    <div>
+                        <div>
+                            <h5>{{ _('My inscriptions') }}</h5>
+
+                            <div class="list-group" v-for="(inscription, inscriptionKey) in importCourseInfo.inscriptions" :key="inscriptionKey">
+                              <form v-bind:id="'form-import-' + inscriptionKey" v-on:submit.prevent="importInscription(inscriptionKey)">
+                                <div class="list-group-item list-group-item-action rounded-2 mb-3" aria-current="true">
+                                  <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">[[ inscription.program]]</h5>
+                                    <small>([[ inscription.programAcronym ]])</small>
+                                  </div>
+                                  <p class="mb-1">{{ _('Course program') }}:</p>
+                                  <span class="badge text-bg-secondary m-1" v-for="code in inscription.generated_codes">
+                                    [[ code ]]
+                                  </span>
+                                </div>
+                              </form>
+                            </div>
+                            <div class="text-danger m-3" v-if="!importCourseInfo.inscriptions.length" >{{  _('There are currently no schedules to import.<br>Encode your codes manually or consult the <a href="https://uclouvain.be/en/study/schedules.html">standard schedule</a> for your course.') }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
+                    <button
+                            type="button"
+                            :disabled="!importCourseInfo.inscriptions.length"
+                            v-on:click="importInscription()"
+                            class="btn btn-success"
+                            data-bs-dismiss="modal" >
+                        {{ _('Import') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Add an event Modal -->
     <div class="modal fade" id="addEventModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
@@ -444,7 +564,12 @@
                     <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
                 </svg>
             </a>
-            <!-- <a class="nav-link" href="#" v-if="show_best_schedules" v-on:click="getEvents(i)" v-bind:class="{active: selected_schedule==i}" v-for="i in n_schedules">{{ _('Schedule') }} #[[ i ]]</a> -->
+            {% if current_user.is_authenticated %}
+            <a class="nav-link" href="#" v-if="show_best_schedules" v-on:click="getEvents(i)" v-bind:class="{active: selected_schedule==i}" v-for="i in n_schedules">{{ _('Schedule') }} #[[ i ]]</a>
+            {% endif %}
+            {% if current_user.is_authenticated %}
+            <a class="nav-link" href="#" v-on:click="importActivities">{{ _('Import') }}</a>
+            {% endif %}
             <a class="nav-link" href="#" v-on:click="getLink">{{ _('Export') }}</a>
             <a class="nav-link" href="#" v-on:click="save">{{_('Save')}}</a>
         </nav>

@@ -20,6 +20,7 @@ from flask_login import current_user, login_required
 import backend.events as evt
 import backend.schedules as schd
 import views.utils as utl
+from ade_scheduler.imports.decorators import import_default_schedule
 
 
 class CalendarEncoder(json.JSONEncoder):
@@ -76,6 +77,10 @@ def index():
 def clear():
     mng = app.config["MANAGER"]
     session["current_schedule"] = schd.Schedule(mng.get_default_project_id())
+    if current_user.is_authenticated:
+        session["current_schedule"] = mng.save_schedule(
+            current_user, session["current_schedule"], session.get("uuid")
+        )
     session["current_schedule_modified"] = False
     return (
         jsonify(
@@ -93,7 +98,8 @@ def clear():
 
 
 @calendar.route("/data", methods=["GET"])
-def get_data():
+@import_default_schedule
+def get_data(autoimport_status):
     mng = app.config["MANAGER"]
     min_time_slot, max_time_slot = session[
         "current_schedule"
@@ -120,6 +126,11 @@ def get_data():
                     )
                 ),
                 "autosave": getattr(current_user, "autosave", False),
+                "autoimport": getattr(current_user, "autoimport", False),
+                "autoimport_status": autoimport_status,
+                "hideautoimport": getattr(
+                    current_user, "hideautoimport", False
+                ),
                 "min_time_slot": min_time_slot,
                 "max_time_slot": max_time_slot,
             }
@@ -322,7 +333,31 @@ def save():
     session["current_schedule"] = mng.save_schedule(
         current_user, session["current_schedule"], session.get("uuid")
     )
+    current_user.set_last_schedule_id(session["current_schedule"].id)
     session["current_schedule_modified"] = False
+    return (
+        jsonify(
+            {
+                "schedules": list(
+                    map(
+                        lambda s: {"id": s.id, "label": gettext(s.data.label)},
+                        current_user.get_schedules(),
+                    )
+                )
+            }
+        ),
+        200,
+    )
+
+
+@calendar.route("/schedules", methods=["GET"])
+def list_all_schedule():
+    if not current_user.is_authenticated:
+        return (
+            gettext("To retrieve your schedule, you need to be logged in."),
+            401,
+        )
+
     return (
         jsonify(
             {
@@ -355,10 +390,6 @@ def download():
     else:
         schedule = session["current_schedule"]
 
-    project_ids = [int(year["id"]) for year in mng.get_project_ids()]
-    if int(schedule.project_id) not in project_ids:
-        schedule.project_id = mng.get_default_project_id()
-
     if schedule is None:
         return (
             gettext(
@@ -367,6 +398,9 @@ def download():
             400,
         )
     else:
+        project_ids = [int(year["id"]) for year in mng.get_project_ids()]
+        if int(schedule.project_id) not in project_ids:
+            schedule.project_id = mng.get_default_project_id()
         resp = make_response(schedule.get_ics_file(schedule_number=choice))
         resp.mimetype = "text/calendar"
         resp.headers["Content-Disposition"] = (

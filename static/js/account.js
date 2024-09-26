@@ -27,6 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
         computing: true,
         unsaved: true,
         autoSave: false,
+        masquerade: '',
+        autoImport: false,
+        displayAll: false,
         isEditing: false,
         externalCalendarForm: {
           code: '',
@@ -53,6 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
             this.currentSchedule = resp.data.current_schedule;
             this.labelBackup = this.currentSchedule.label;
             this.autoSave = resp.data.autosave;
+            this.autoImport = resp.data.autoimport;
+            this.masquerade = resp.data.masquerade;
+            if (resp.data.displayAll){
+              this.displayAll = resp.data.displayAll;
+            }
           })
           .catch((err) => {
             store.error(err.response.data);
@@ -74,6 +82,41 @@ document.addEventListener('DOMContentLoaded', () => {
             store.error(err.response.data);
           })
           .then(() => {
+            this.computing = false;
+          });
+      },
+      changeMasquerade() {
+        this.computing = true;
+        axios({
+          method: 'POST',
+          url: Flask.url_for('account.masquerade'),
+          header: { 'Content-Type': 'application/json' },
+          data: { masquerade: this.masquerade },
+        })
+          .then(() => {})
+          .catch((err) => {
+            store.error(err.response.data);
+          })
+          .then(() => {
+            this.computing = false;
+          });
+      },
+      resetAutoImport(){
+        this.computing = true;
+        axios({
+          method: 'POST',
+          url: Flask.url_for('account.reset_autoimport'),
+          header: { 'Content-Type': 'application/json' },
+          data: { autoimport: false}
+        })
+          .then(() => {
+            store.info('Success');
+          })
+          .catch((err) => {
+            store.error(err.response.data);
+          })
+          .then(() => {
+            this.autoImport = false;
             this.computing = false;
           });
       },

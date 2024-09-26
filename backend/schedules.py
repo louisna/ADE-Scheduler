@@ -15,6 +15,7 @@ import backend.events as evt
 from backend.courses import Course, merge_courses
 
 DEFAULT_SCHEDULE_NAME = _l("New schedule")
+DEFAULT_IMPORT_SCHEDULE_NAME = _l("My schedule")
 COLOR_PALETTE = [
     "#bf616a",
     "#2e3440",

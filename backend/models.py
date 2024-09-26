@@ -165,8 +165,11 @@ class User(mxn.UserMixin, db.Model):
         db.String(8), unique=True, nullable=False
     )  # The user identifier
     email = db.Column(db.String(255), unique=True, nullable=False)
-    first_name = db.Column(db.String(40))
-    last_name = db.Column(db.String(40))
+    first_name = db.Column(db.String(150))
+    last_name = db.Column(db.String(150))
+    masquerade = db.Column(
+        db.String(8), unique=False, nullable=True
+    )  # The user identifier to masquerade
 
     # Track login
     created_at = db.Column(db.DateTime())
@@ -177,6 +180,18 @@ class User(mxn.UserMixin, db.Model):
         db.Boolean(),
         nullable=False,
         default=True,
+        server_default=sa.sql.expression.literal(True),
+    )
+    autoimport = db.Column(
+        db.Boolean(),
+        nullable=False,
+        default=False,
+        server_default=sa.sql.expression.literal(True),
+    )
+    hideautoimport = db.Column(
+        db.Boolean(),
+        nullable=False,
+        default=False,
         server_default=sa.sql.expression.literal(True),
     )
     last_schedule_id = db.Column(db.Integer(), nullable=True)
@@ -251,6 +266,18 @@ class User(mxn.UserMixin, db.Model):
 
     def set_autosave(self, autosave):
         self.autosave = autosave
+        db.session.commit()
+
+    def set_masquerade(self, masquerade):
+        self.masquerade = masquerade
+        db.session.commit()
+
+    def set_autoimport(self, autoimport):
+        self.autoimport = autoimport
+        db.session.commit()
+
+    def set_hideautoimport(self, hideautoimport):
+        self.hideautoimport = hideautoimport
         db.session.commit()
 
     def set_last_schedule_id(self, schedule_id):

@@ -109,6 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
         code: '',
         codeSearch: [],
         autoSave: false,
+        autoImport: false,
+        hideAutoImportModal: false,
         unsaved: false,
         currentSchedule: {},
         currentEventColor: '',
@@ -125,6 +127,16 @@ document.addEventListener('DOMContentLoaded', () => {
           beginRecurrDay: '',
           endRecurrDay: '',
           recurring: false,
+        },
+        importCourseInfo: {
+          inscriptions: [{
+            program: '',
+            programAcronym: '',
+            generated_codes: []
+          }]
+        },
+        importForm:{
+          codes: []
         },
         courseInfo: {
           code: '',
@@ -233,14 +245,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (document.body.clientWidth > 550) {
               vm.calendarOptions.headerToolbar.right =
                 'dayGridMonth,timeGridWeek';
-              vm.calendarOptions.headerToolbar.center = 'title';
               if (arg.view.type === 'timeGridDay') {
                 this.changeView('timeGridWeek');
               }
             } else {
+              vm.calendarOptions.headerToolbar.left= 'prev,today,next addEvent';
               vm.calendarOptions.headerToolbar.right =
                 'dayGridMonth,timeGridDay';
-              vm.calendarOptions.headerToolbar.center = '';
               if (arg.view.type === 'timeGridWeek') {
                 this.changeView('timeGridDay');
               }
@@ -254,8 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
               collapseExtendedProps: true,
             });
             const italicEl = document.createElement('t');
-            italicEl.innerHTML = `<b>${evt.title}</b><br/><i>${evt.location}</i>`;
-
+            italicEl.innerHTML = `<b>${evt.title}</b><br/><small>${evt.event_code}</small><br/><i>${evt.location}</i>`;
             const arrayOfDomNodes = [italicEl];
             return { domNodes: arrayOfDomNodes };
           },
@@ -294,10 +304,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 sanitize: false,
                 html: true,
                 template: `
-                                <div class="tooltip" role="tooltip">
-                                    <div class="tooltip-arrow"></div>
-                                    <div class="tooltip-inner" style="background-color:${evt.backgroundColor}; color:${color}"></div>
-                                </div>`,
+                  <div class="tooltip" role="tooltip">
+                      <div class="tooltip-arrow"></div>
+                      <div class="tooltip-inner" style="background-color:${evt.backgroundColor}; color:${color}"></div>
+                  </div>`,
                 placement: 'auto',
               });
             }
@@ -353,6 +363,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
       },
     },
+    mounted() {
+      getTranslatedText();
+    },
     watch: {
       codeSearchDisplay() {
         if (this.codeSearchDisplay) {
@@ -375,9 +388,6 @@ document.addEventListener('DOMContentLoaded', () => {
         200
       );
     },
-    mounted() {
-      getTranslatedText();
-    },
     methods: {
       fetchData() {
         this.computing = true;
@@ -395,6 +405,9 @@ document.addEventListener('DOMContentLoaded', () => {
             this.currentSchedule = resp.data.current_schedule;
             this.setUnsavedStatus(resp.data.unsaved);
             this.autoSave = resp.data.autosave;
+            this.autoImport = resp.data.autoimport;
+            this.autoImportStatus = resp.data.autoimport_status;
+            this.hideAutoImportModal = resp.data.hideautoimport;
             this.calendarOptions.slotMinTime = resp.data.min_time_slot;
             this.calendarOptions.slotMaxTime = resp.data.max_time_slot;
           })
@@ -403,6 +416,22 @@ document.addEventListener('DOMContentLoaded', () => {
           })
           .then(() => {
             this.computing = false;
+            const loggedOut= document.getElementById('user-logged-out');
+            if (loggedOut == null ) {
+              switch (this.autoImportStatus) {
+              case 'ready':
+                if (!this.hideAutoImportModal) {
+                  autoImportModal.show();
+                }
+                break;
+              case 'already_imported':
+                // do nothing
+                break;
+              case 'done':
+                infoImportModal.show();
+                break;
+              }
+            }
           });
       },
       loadSchedule(e, id) {
@@ -490,6 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
               store.error(err.response.data);
             })
             .then(() => {
+              this.loadSchedules();
               this.computing = false;
             });
         };
@@ -532,6 +562,23 @@ document.addEventListener('DOMContentLoaded', () => {
             this.calendarOptions.events = resp.data.events;
             this.setUnsavedStatus(resp.data.unsaved);
             this.show_best_schedules = false;
+          })
+          .catch((err) => {
+            store.error(err.response.data);
+          })
+          .then(() => {
+            this.computing = false;
+          });
+      },
+      importActivities() {
+        this.computing = true;
+        axios({
+          method: 'GET',
+          url: Flask.url_for('import.activities'),
+        })
+          .then((resp) => {
+            this.importCourseInfo.inscriptions = resp.data.inscriptions;
+            importModal.show();
           })
           .catch((err) => {
             store.error(err.response.data);
@@ -594,6 +641,67 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
               store.error(err.response.data);
             }
+          })
+          .then(() => {
+            this.computing = false;
+          });
+      },
+      loadSchedules() {
+        this.computing = true;
+        axios({
+          method: 'GET',
+          url: Flask.url_for('calendar.list_all_schedule'),
+        })
+          .then((resp) => {
+            this.schedules = resp.data.schedules;
+          })
+          .catch((err) => {
+            if (err.response.status === 401) {
+              store.info(err.response.data);
+            } else {
+              store.error(err.response.data);
+            }
+          })
+          .then(() => {
+            this.computing = false;
+          });
+      },
+      importInscription(){
+        this.computing = true;
+        axios({
+          method: 'POST',
+          url: Flask.url_for('import.import_schedule')
+        })
+          .then((resp) => {
+            if (resp.status === 202) {
+              store.info(resp.data);
+              importModal.hide();
+            } else {
+              this.loadSchedule('', resp.data.current_schedule.id);
+              importModal.hide();
+              infoImportModal.show();
+            }
+          })
+          .catch((err) => {
+            store.error(err);
+          })
+          .then(() => {
+            this.computing = false;
+          });
+      },
+      hideAutoImport(){
+        this.computing = true;
+        axios({
+          method: 'POST',
+          url: Flask.url_for('account.hide_autoimport'),
+          header: { 'Content-Type': 'application/json' },
+        })
+          .then(() => {
+            this.hideAutoImportModal = true;
+            autoImportModal.hide();
+          })
+          .catch((err) => {
+            store.error(err.response.data);
           })
           .then(() => {
             this.computing = false;
@@ -992,6 +1100,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         return `${yearShort}`;
       },
+      getCourseURL(code) {
+        const yearShort= this.getYearShort();
+        const courseBaseUrl = getTranslatedText(currentLanguage, 'courseBaseUrl');
+        return `${courseBaseUrl}-${yearShort}-${code}`;
+      },
     },
   });
 
@@ -1014,7 +1127,10 @@ document.addEventListener('DOMContentLoaded', () => {
   var codeDropdown = new Dropdown(document.getElementById('codeInputDropdown'));
   var addEventModal = new Modal(document.getElementById('addEventModal'));
   var eventModal = new Modal(document.getElementById('eventModal'));
+  var importModal = new Modal(document.getElementById('importModal'));
   var exportModal = new Modal(document.getElementById('exportModal'));
   var courseModal = new Modal(document.getElementById('courseModal'));
   var warningModal = new Modal(document.getElementById('warningModal'));
+  var infoImportModal = new Modal(document.getElementById('infoImportModal'));
+  var autoImportModal = new Modal(document.getElementById('autoImportModal'));
 });

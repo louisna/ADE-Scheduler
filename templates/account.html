@@ -217,6 +217,47 @@ _.forEach(htmlWebpackPlugin.files.js, function(file) { %>
             </div>
           </div>
         </div>
+        <div class="card mb-3" v-if="displayAll">
+          <div class="card-header">
+            <div class="h5 mb-0 text-muted">{{ _('Masquerade') }}</div>
+          </div>
+          <div class="card-body">
+            <div
+              class="d-flex flex-row justify-content-between"
+              id="form-masquerade"
+            >
+                <div class="flex-grow-1">
+                    <h6>{{ _('Enter identifier to masquerade user') }}</h6>
+                  </div>
+                    <input
+                      class="form-control me-3"
+                      size="50"
+                      type="text"
+                      v-model = "masquerade"
+                  />
+              <button
+                class="btn btn-sm"
+                v-on:click="changeMasquerade()"
+                v-bind:class="[[ 'btn-outline-danger' ]]"
+              >
+                [[ "{{ _('Save') }}" ]]
+              </button>
+
+            </div>
+            <div
+                class="d-flex flex-row justify-content-between mt-4"
+                id="form-autoimport">
+              <h6>{{ _('Reset auto import flag') }}</h6>
+              <button
+                class="btn btn-sm"
+                v-on:click="resetAutoImport()"
+                v-bind:class="[[ autoImport ? 'btn-outline-success' : 'btn-outline-danger' ]]"
+              >
+                [[ "{{ _('Reset') }}" ]]
+              </button>
+            </div>
+          </div>
+        </div>
       </spinner>
     </div>
 

@@ -249,10 +249,14 @@ class AcademicalEvent(CustomEvent):
     :type weight: Union[int, float]
     :param code: code of the course related to this event
     :type code: Optional[str]
+    :param event_code: code of the event
+    :type code: Optional[str]
     :param prefix: the prefix used for to describe the type of event
     :type prefix: Optional[str]
     :param note: a note to be added to the event description
     :type str: Optional[str]
+    :param last_update: last date update for this event
+    :type str: Optional[datetime]
     """
 
     KEYWORDS = ()
@@ -267,8 +271,10 @@ class AcademicalEvent(CustomEvent):
         id: Optional[str] = None,
         weight: Union[int, float] = 5,
         code: Optional[str] = None,
+        event_code: Optional[str] = None,
         prefix: Optional[str] = None,
         note: Optional[str] = None,
+        last_update: Optional[datetime] = None,
     ):
         super().__init__(
             name=name,
@@ -282,9 +288,14 @@ class AcademicalEvent(CustomEvent):
         )
         self.id = f"{prefix}{id}"
         self.code = code
+        self.event_code = event_code
         self.classrooms = classrooms
+        time_slot = (
+            f"{pretty_hour_formatter(self.begin)} - "
+            f"{pretty_hour_formatter(self.end)}"
+        )
         self.description = (
-            f"{self.name}\n" f"{self.duration!s}\n" f"{self.description}"
+            f"{event_code}\n" f"{time_slot}\n" f"{self.description}"
         )
         self.note = note
 
@@ -340,6 +351,7 @@ class AcademicalEvent(CustomEvent):
                 "title": self.name,
                 "description": self.description,
                 "code": self.code,
+                "event_code": self.event_code,
             }
         )
 
@@ -385,7 +397,7 @@ class EventORAL(AcademicalEvent):
 
 class EventLABO(AcademicalEvent):
     PREFIX = "LABO: "
-    KEYWORDS = "labo"
+    KEYWORDS = ("labo",)
 
     def __init__(self, **kwargs):
         super().__init__(prefix=EventLABO.PREFIX, **kwargs)
@@ -492,9 +504,15 @@ def extract_datetime(
     :return: datetime objects (start date, end date)
     :rtype: Tuple[datetime, datetime]
     """
-    t0 = datetime.strptime(date + "-" + start, "%d/%m/%Y-%H:%M").astimezone(TZ)
-    t1 = datetime.strptime(date + "-" + end, "%d/%m/%Y-%H:%M").astimezone(TZ)
+    t0 = str_to_datetime(date + "-" + start)
+    t1 = str_to_datetime(date + "-" + end)
     if t0 < t1:
         return t0, t1
     else:
         return t1, t0
+
+
+def str_to_datetime(date: str, format="%d/%m/%Y-%H:%M") -> datetime:
+    """Parse string to datetime object."""
+    if date:
+        return datetime.strptime(date, format).astimezone(TZ)
