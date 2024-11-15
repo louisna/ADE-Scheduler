@@ -50,6 +50,7 @@ import backend.security as scty
 import backend.servers as srv
 import backend.track_usage as tu
 import backend.uclouvain_apis as ucl
+from ade_scheduler.imports.views import api_blueprint as api_import
 from cli import (
     cli_api_usage,
     cli_client,
@@ -115,6 +116,7 @@ app.register_blueprint(api, url_prefix="/api")
 app.register_blueprint(whatisnew, url_prefix="/whatisnew")
 app.register_blueprint(contribute, url_prefix="/contribute")
 app.register_blueprint(admin, url_prefix="/admin")
+app.register_blueprint(api_import)
 app.config["SECRET_KEY"] = os.environ["FLASK_SECRET_KEY"]
 app.config["SALT"] = os.environ["FLASK_SALT"]
 jsglue = JSGlue(app)

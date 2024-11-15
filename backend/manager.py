@@ -290,12 +290,20 @@ class Manager:
     ) -> list[str]:
         # Actually returns names matchings :)
         course_resources = self.get_course_resources(project_id)
+        ## MATCHING BY NAME
         matching_code = course_resources[rsrc.INDEX.NAME].str.contains(
             pattern, case=False, regex=False
         )
         courses_matching = course_resources[matching_code][
             rsrc.INDEX.NAME
         ].to_list()
+        # MATCHING BY CODE
+        matching_code = course_resources[rsrc.INDEX.CODE].str.contains(
+            pattern, case=False, regex=False
+        )
+        courses_matching.extend(
+            course_resources[matching_code][rsrc.INDEX.CODE].to_list()
+        )
         courses_matching.extend(
             map(
                 lambda ec: ec.code,
@@ -304,7 +312,7 @@ class Manager:
                 .all(),
             )
         )
-        return courses_matching
+        return sorted(set(courses_matching))
 
     def get_classrooms(
         self,
@@ -394,10 +402,9 @@ class Manager:
 
         for value in self.server.hgetall(key).values():
             value = value.decode()
+            data = self.client.get_resource_ids(value)
             key = f"[RESOURCE_IDs,project_id={value}]"
-            resource_ids = ade.response_to_resource_ids(
-                self.client.get_resource_ids(value)
-            )
+            resource_ids = ade.response_to_resource_ids(data)
             self.server.set_value(
                 key, resource_ids, expire_in=self.ttl["resource_ids"], hmap=True
             )
@@ -452,6 +459,25 @@ class Manager:
         self.server.set_value(
             key, project_ids, expire_in=self.ttl["project_ids"], hmap=True
         )
+
+    def get_default_project(self) -> str:
+        """
+        Returns the default project id.
+
+        :return: the default project id
+        :rtype: str
+        """
+        return self.get_project_ids()[0]
+
+    def get_default_project_year(self) -> int:
+        """
+        Returns the default project id.
+
+        :return: the default project id
+        :rtype: str
+        """
+        project = self.get_project_ids()[0]
+        return int(project["year"][:4])
 
     def get_default_project_id(self) -> str:
         """

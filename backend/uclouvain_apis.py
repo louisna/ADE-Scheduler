@@ -1,6 +1,7 @@
 import os
 
 import requests
+from flask import current_app
 
 
 class API:
@@ -61,3 +62,47 @@ class My(API):
 
 class MyADE(API):
     ENDPOINT = "myADE/v1"
+
+
+class Students(API):
+    ENDPOINT = "students/v0"
+
+    @classmethod
+    def inscription_url(cls, identifier, year):
+        """Get inscriptions url.
+
+        :param identifier: identifier of student.
+        :param year: academic start year.
+        return: url
+        """
+        return f"{identifier}/inscriptionsetoptions/{year}"
+
+    @classmethod
+    def activities_url(cls, identifier, year):
+        """Get activities url.
+
+        :param identifier: identifier of student.
+        :param year: academic start year.
+        return: url
+        """
+        return f"{identifier}/activities/{year}"
+
+    @classmethod
+    def get_inscriptions(cls, identifier, current_year):
+        """Get inscriptions user for the given year."""
+        manager = current_app.config["MANAGER"]
+        headers = manager.client.get_headers()
+
+        resp = cls.get(
+            Students.inscription_url(identifier, current_year), headers=headers
+        )
+
+        inscriptions = (
+            resp.json().get("lireInscriptionEtOptionAnacResponse") or {}
+        )
+
+        return [
+            data
+            for data in inscriptions.get("return", [])
+            if data["anac"] == current_year
+        ]

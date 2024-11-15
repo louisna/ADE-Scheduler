@@ -1,7 +1,15 @@
 import os
 from datetime import datetime
 
-from flask import Blueprint, flash, redirect, request, session, url_for
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    redirect,
+    request,
+    session,
+    url_for,
+)
 from flask import current_app as app
 from flask_babel import gettext
 from flask_login import login_user, logout_user
@@ -49,120 +57,124 @@ def login():  # noqa: C901
         # Automatically login the dev-user
         login_user(user)
         return redirect(url_for("calendar.index"))
+    try:
+        # Proceed with the normal login procedure
+        uclouvain = app.config["UCLOUVAIN_MANAGER"]
 
-    # Proceed with the normal login procedure
-    uclouvain = app.config["UCLOUVAIN_MANAGER"]
+        # Request code
+        if request.args.get("code") is None:
+            redirect_uri = url_for("security.login", _external=True)
+            return uclouvain.authorize_redirect(redirect_uri)
 
-    # Request code
-    if request.args.get("code") is None:
-        redirect_uri = url_for("security.login", _external=True)
-        return uclouvain.authorize_redirect(redirect_uri)
-
-    # Code received
-    else:
-        # Fetch token
-        token = uclouvain.authorize_access_token()
-        # Fetch user role & ID
-        my_fgs = None
-        role = None
-        api_base_url = app.config["MY_BASE_URL"]
-        my_role_url = os.path.join(api_base_url, My.roles_url())
-        resp = uclouvain.get(my_role_url, token=token)
-        try:
-            resp.raise_for_status()
-        except HTTPError as err:
-            flash(
-                gettext(
-                    "Hum... it looks like the authentification server is having some issues - please try again. If the problem persists, do contact us directly so we can look into it."
-                ),
-                "error",
-            )
-            app.logger.error(err)
-            return redirect(url_for("calendar.index"))
-        data = resp.json()
-        roles = list()
-        for business_role in data["businessRoles"]["businessRole"]:
-            roles.append(business_role["businessRoleCode"])
-            my_fgs = business_role["identityId"]
-
-        # Determine which role, priority on student, then employee.
-        if 2 in roles:
-            role = "student"
-        elif 1 in roles:
-            role = "employee"
+        # Code received
         else:
-            flash(
-                gettext(
-                    "Hum... it looks like there is an issue with your UCLouvain account. Please contact directly so we can look into it and fix it for you !"
-                )
-                + "<br><br><b>Code: role list</b>",
-                "error",
-            )
-            app.logger.error("role not found", exc_info=True)
-            return redirect(url_for("calendar.index"))
-
-        # Create user if does not exist
-        user = md.User.query.filter_by(fgs=my_fgs).first()
-        if user is None:
-            my_employee_url = os.path.join(
-                api_base_url, My.personal_data_url(role)
-            )
-            resp = uclouvain.get(my_employee_url, token=token)
+            # Fetch token
+            token = uclouvain.authorize_access_token()
+            # Fetch user role & ID
+            my_fgs = None
+            role = None
+            api_base_url = app.config["MY_BASE_URL"]
+            my_role_url = os.path.join(api_base_url, My.roles_url())
+            resp = uclouvain.get(my_role_url, token=token)
             try:
                 resp.raise_for_status()
-            except HTTPError:
+            except HTTPError as err:
                 flash(
                     gettext(
                         "Hum... it looks like the authentification server is having some issues - please try again. If the problem persists, do contact us directly so we can look into it."
                     ),
                     "error",
                 )
-                app.logger.error("role not found", exc_info=True)
+                app.logger.error(err)
                 return redirect(url_for("calendar.index"))
             data = resp.json()
+            roles = list()
+            for business_role in data["businessRoles"]["businessRole"]:
+                roles.append(business_role["businessRoleCode"])
+                my_fgs = business_role["identityId"]
 
-            # Student
-            if role == "student":
-                data = data["lireDossierEtudiantResponse"]["return"]
-                email = data["email"]
-                first_name = data["prenom"]
-                last_name = data["nom"]
-
-            # Employee
-            elif role == "employee":
-                data = data["person"]
-                email = data["email"]
-                first_name = data["firstname"]
-                last_name = data["lastname"]
-
-            # Not implemented, raise error
+            # Determine which role, priority on student, then employee.
+            if 2 in roles:
+                role = "student"
+            elif 1 in roles:
+                role = "employee"
             else:
-                raise NotImplementedError(
-                    f"Role {role} is not implemented yet !"
+                flash(
+                    gettext(
+                        "Hum... it looks like there is an issue with your UCLouvain account. Please contact directly so we can look into it and fix it for you !"
+                    )
+                    + "<br><br><b>Code: role list</b>",
+                    "error",
                 )
+                app.logger.error("role not found", exc_info=True)
+                return redirect(url_for("calendar.index"))
 
-            now = datetime.now()
-            user = md.User(
-                fgs=my_fgs,
-                email=email,
-                first_name=first_name,
-                last_name=last_name,
-                created_at=now,
-                last_seen_at=now,
-            )
-            md.db.session.add(user)
-            md.db.session.commit()
+            # Create user if does not exist
+            user = md.User.query.filter_by(fgs=my_fgs).first()
+            if user is None:
+                my_employee_url = os.path.join(
+                    api_base_url, My.personal_data_url(role)
+                )
+                resp = uclouvain.get(my_employee_url, token=token)
+                try:
+                    resp.raise_for_status()
+                except HTTPError:
+                    flash(
+                        gettext(
+                            "Hum... it looks like the authentification server is having some issues - please try again. If the problem persists, do contact us directly so we can look into it."
+                        ),
+                        "error",
+                    )
+                    app.logger.error("role not found", exc_info=True)
+                    return redirect(url_for("calendar.index"))
+                data = resp.json()
 
-        # Login user
-        login_user(user, remember=True)
+                # Student
+                if role == "student":
+                    data = data["lireDossierEtudiantResponse"]["return"]
+                    email = data["email"]
+                    first_name = data["prenom"]
+                    last_name = data["nom"]
 
-        # Create response, redirect if next param is found
-        next = session.pop("next", None)
-        if next is not None:
-            resp = redirect(next)
-        else:
-            resp = redirect(url_for("calendar.index"))
-        return cookies.set_oauth_token(token, resp)
+                # Employee
+                elif role == "employee":
+                    data = data["person"]
+                    email = data["email"]
+                    first_name = data["firstname"]
+                    last_name = data["lastname"]
+
+                # Not implemented, raise error
+                else:
+                    raise NotImplementedError(
+                        f"Role {role} is not implemented yet !"
+                    )
+
+                now = datetime.now()
+                user = md.User(
+                    fgs=my_fgs,
+                    email=email,
+                    first_name=first_name,
+                    last_name=last_name,
+                    created_at=now,
+                    last_seen_at=now,
+                )
+                md.db.session.add(user)
+                md.db.session.commit()
+
+            # Login user
+            login_user(user, remember=True)
+
+            # Create response, redirect if next param is found
+            next = session.pop("next", None)
+            if next is not None:
+                resp = redirect(next)
+            else:
+                resp = redirect(url_for("calendar.index"))
+            return cookies.set_oauth_token(token, resp)
+    except Exception as err:
+        current_app.logger.error(err, exc_info=True)
+        return redirect(url_for("calendar.index"))
+        # raise err
 
 
 @security.route("/logout")

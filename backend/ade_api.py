@@ -162,7 +162,7 @@ class DummyClient:
         :rtype: request.Response
         """
         return self.request(
-            projectId=project_id, function="resources", detail=2
+            projectId=project_id, function="resources", detail=11
         )
 
     def get_classrooms(self, project_id: str) -> requests.Response:
@@ -225,6 +225,14 @@ class Client(DummyClient):
     def renew_token(self):
         self.token, self.expiration = get_token(self.credentials)
         self.expiration += time.time()
+
+    def get_token(self):
+        if self.is_expired():
+            self.renew_token()
+        return self.token
+
+    def get_headers(self) -> dict:
+        return {"Authorization": f"Bearer {self.get_token()}"}
 
     def request(self, **kwargs: Request) -> requests.Response:
         if self.is_expired():
@@ -348,9 +356,8 @@ def get_token(credentials: ClientCredentials) -> tuple[str, int]:
     }
     resp = requests.post(url=url, headers=headers, data=data)
 
-    if (
-        current_app
-    ):  # To prevent error on app initilisation where a token is requested
+    # To prevent error on app initilisation where a token is requested
+    if current_app:
         md.ApiUsage("token", resp)
     resp.raise_for_status()
     r = resp.json()
@@ -366,7 +373,9 @@ def response_to_root(response: requests.Response) -> etree._Element:
     :return: the tree structure
     :rtype: etree._ElementTree
     """
-    return etree.fromstring(response.content)
+    return etree.fromstring(
+        response.content, parser=etree.XMLParser(huge_tree=True)
+    )
 
 
 def response_to_project_ids(
@@ -473,19 +482,40 @@ def response_to_resource_ids(resource_ids_response) -> dict[str, str]:
     """
     root = response_to_root(resource_ids_response)
 
+    df_id_by_name = etree_to_resource_ids(root)
+    df_id_by_code = etree_to_resource_ids(root, key="code")
+
+    df_all = pd.concat([df_id_by_name, df_id_by_code])
+
+    return df_all.to_dict()
+
+
+def etree_to_resource_ids(root, key="name") -> dict[str, str]:
+    """
+    Extracts an API response into an dictionary mapping a resource name to its ids.
+
+    :param resource_ids_response: a response from the API to the resources or resource_ids request
+    :type resource_ids_response: requests.Response
+    :return: all the resources names and their ids
+    :rtype: Dict[str, str]
+
+    :Example:
+
+    >>> response = client.get_resource_ids(9)  # project id for 2019-2020
+    >>> resources_ids = response_to_resource_ids(response)
+    """
+    xpath = f"//resource/@{key}"
+
     df = pd.DataFrame(
         data=root.xpath("//resource/@id"),
-        index=map(lambda x: x.upper(), root.xpath("//resource/@name")),
+        index=map(lambda x: x.upper(), root.xpath(xpath)),
         columns=["id"],
         dtype=str,
     )
 
-    d = (
-        df.groupby(level=0)
-        .apply(lambda x: "|".join(x.to_dict(orient="list")["id"]))
-        .to_dict()
+    d = df.groupby(level=0).apply(
+        lambda x: "|".join(x.to_dict(orient="list")["id"])
     )
-
     return d
 
 
@@ -571,6 +601,10 @@ def parse_event(
     event_date = event.attrib["date"]
     event_start = event.attrib["startHour"]
     event_end = event.attrib["endHour"]
+    event_code = event.attrib["name"]
+    last_update = backend.events.str_to_datetime(
+        event.attrib["lastUpdate"], format="%m/%d/%Y %H:%M"
+    )
     rooms = event.xpath('.//eventParticipant[@category="classroom"]')
     classrooms = [room_to_classroom(room) for room in rooms]
     note = event.attrib["note"]
@@ -594,7 +628,9 @@ def parse_event(
         classrooms=classrooms,
         id=activity_id,
         code=activity_code,
+        event_code=event_code,
         note=note,
+        last_update=last_update,
     )
 
 

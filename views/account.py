@@ -11,6 +11,7 @@ from ics import Calendar
 
 import backend.schedules as schd
 import views.utils as utl
+from ade_scheduler.imports.utils import get_admin_uuid
 from backend.manager import ExternalCalendarAlreadyExistsError
 
 
@@ -63,8 +64,12 @@ def index():
 @account.route("/data", methods=["GET"])
 @login_required
 def get_data():
-    mng = app.config["MANAGER"]
+    # TODO: refactor this when using user role
+    display_admin = False
+    if current_user.is_authenticated and current_user.fgs in get_admin_uuid():
+        display_admin = True
 
+    mng = app.config["MANAGER"]
     return (
         jsonify(
             {
@@ -82,6 +87,9 @@ def get_data():
                 "project_id": mng.get_project_ids(),
                 "unsaved": session["current_schedule_modified"],
                 "autosave": current_user.autosave,
+                "autoimport": current_user.autoimport,
+                "displayAll": display_admin,
+                "masquerade": current_user.masquerade,
                 "schedules": list(
                     map(
                         lambda s: {"id": s.id, "label": s.data.label},
@@ -220,6 +228,32 @@ def save():
 def autosave():
     current_user.set_autosave(request.json["autosave"])
     return jsonify({}), 200
+
+
+@account.route("/autoimport", methods=["POST"])
+@login_required
+def reset_autoimport():
+    if current_user.fgs in get_admin_uuid():
+        current_user.set_hideautoimport(False)
+        current_user.set_autoimport(False)
+        return jsonify({}), 200
+    return jsonify({}), 403
+
+
+@account.route("/hideautoimport", methods=["POST"])
+@login_required
+def hide_autoimport():
+    current_user.set_hideautoimport(True)
+    return jsonify({}), 200
+
+
+@account.route("/masquerade", methods=["POST"])
+@login_required
+def masquerade():
+    if current_user.fgs in get_admin_uuid():
+        current_user.set_masquerade(request.json["masquerade"])
+        return jsonify({}), 200
+    return jsonify({}), 403
 
 
 @account.route("/external_calendar", methods=["POST"])
