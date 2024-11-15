@@ -276,11 +276,11 @@ key = base64.urlsafe_b64encode(kdf.derive(password))
 app.config["FERNET"] = Fernet(key)
 
 
-app.config["ADE_SCHEDULER_IMPORT_EXTERNAL_CAL"] = os.getenv(
-    "ADE_SCHEDULER_IMPORT_EXTERNAL_CAL", False
+app.config["ADE_SCHEDULER_IMPORT_EXTERNAL_CAL"] = bool(
+    os.getenv("ADE_SCHEDULER_IMPORT_EXTERNAL_CAL", False)
 )
-app.config["ADE_SCHEDULER_COMPUTE_SCHEDULE"] = os.getenv(
-    "ADE_SCHEDULER_COMPUTE_SCHEDULE", False
+app.config["ADE_SCHEDULER_COMPUTE_SCHEDULE"] = bool(
+    os.getenv("ADE_SCHEDULER_COMPUTE_SCHEDULE", False)
 )
 
 
