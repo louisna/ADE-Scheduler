@@ -45,7 +45,7 @@ jobs:
         node-version: '16'
 
     - name: Docker compose up
-      run: docker-compose up -d
+      run: docker compose up -d
 
     - name: Bootstrap
       run: |
